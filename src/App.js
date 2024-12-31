@@ -7,15 +7,25 @@ const initialState = {
   // can be loaiding, error, ready, active, finished
   status: "loading",
 };
-function reducer(state, reducer) {}
+function reducer(state, action) {
+  switch (action.type) {
+    case "dataReceived":
+      return { ...state, questions: action.paylaod, status: "ready" };
+    case "dataFailed":
+      return { ...state, status: "Error" };
+
+    default:
+      throw new Error("Unknown action");
+  }
+}
 export default function App() {
   // creating state using reducer
   const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(function () {
     fetch("http://localhost:8000/questions")
       .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.log("Error fetching data"));
+      .then((data) => dispatch({ type: "dataReceived", paylaod: data }))
+      .catch((err) => dispatch({ type: "dataFailed" }));
   }, []);
 
   return (
